@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mindful • Relax</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#eaf6f1;--bg2:#e9e5f8;--card:rgba(255,255,255,.75);--text:#243832;--muted:#71827d;--primary:#527d70;--secondary:#78998d;--danger:#987878}
+body.dark{--bg:#18221f;--bg2:#202238;--card:rgba(39,53,49,.9);--text:#eef7f3;--muted:#a9bbb5;--primary:#78a99a;--secondary:#638f82;--danger:#a98282}
+body{min-height:100vh;font-family:Arial,sans-serif;background:linear-gradient(145deg,var(--bg),var(--bg2));color:var(--text);transition:.3s}
+.app{width:100%;max-width:450px;min-height:100vh;margin:auto;padding:20px 18px 35px}
+.screen{display:none}.screen.active{display:block}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px}
+.logo{font-size:21px;font-weight:bold}
+.icon-btn{width:42px;height:42px;padding:0;border-radius:50%;margin:0;background:var(--card);color:var(--text)}
+h1{font-size:36px;margin-bottom:12px}h2{margin-bottom:10px}h3{margin:15px 0 8px}
+.subtitle{color:var(--muted);line-height:1.5;margin-bottom:25px}
+button{border:none;padding:14px 20px;border-radius:28px;font-size:15px;cursor:pointer;background:var(--primary);color:white;margin:5px;transition:.15s}
+button:active{transform:scale(.96)}.secondary{background:var(--secondary)}.danger{background:var(--danger)}
+.card{background:var(--card);backdrop-filter:blur(15px);border-radius:22px;padding:20px;margin:14px 0;box-shadow:0 12px 35px rgba(0,0,0,.08)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.option{background:var(--card);color:var(--text);border:2px solid transparent;box-shadow:none}.option.selected{border-color:var(--primary)}
+.timer{font-size:48px;font-weight:bold;margin:20px 0}.instruction{font-size:27px;font-weight:bold;margin-bottom:25px;letter-spacing:1px}
+.circle{width:190px;height:190px;margin:0 auto 28px;border-radius:50%;background:rgba(255,255,255,.6);display:flex;align-items:center;justify-content:center;font-size:46px;box-shadow:0 10px 35px rgba(0,0,0,.09);transition:transform 4s ease-in-out}
+.circle.inhale{transform:scale(1.22)}.circle.exhale{transform:scale(.82)}.circle.hold{transform:scale(1.08)}
+.small{font-size:13px;color:var(--muted);line-height:1.5;margin-top:15px}
+.range{width:100%;accent-color:var(--primary)}
+textarea,input{width:100%;border:none;border-radius:16px;padding:14px;background:rgba(255,255,255,.8);color:#263a35;outline:none;margin-top:8px;font-family:Arial,sans-serif}
+textarea{height:120px;resize:none}.moods{display:flex;justify-content:space-between;margin:15px 0}
+.mood{background:none;color:var(--text);font-size:27px;padding:5px;margin:0}.mood.selected{transform:scale(1.3)}
+.stat{text-align:center;padding:15px 5px;background:var(--card);border-radius:17px}.stat-number{font-size:25px;font-weight:bold}.stat-label{font-size:12px;color:var(--muted);margin-top:5px}
+.history-item{padding:12px 0;border-bottom:1px solid rgba(100,100,100,.15);font-size:14px}
+.stars{font-size:34px;margin:18px 0}.stars span{cursor:pointer;opacity:.3;margin:2px}.stars span.selected{opacity:1}
+.back{background:transparent;color:var(--text);padding:8px;margin:0 0 10px}.center{text-align:center}
+.nav{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:20px}.nav button{font-size:12px;padding:11px 5px;margin:0;background:var(--card);color:var(--text)}
+.sound-buttons{display:flex;overflow-x:auto;gap:5px;padding-bottom:5px}.sound-buttons button{white-space:nowrap}
+.success{color:var(--primary);font-size:14px;min-height:20px}.profile-avatar{width:75px;height:75px;border-radius:50%;margin:10px auto;display:flex;align-items:center;justify-content:center;font-size:35px;background:var(--card)}
+label{display:block;text-align:left;font-size:13px;color:var(--muted);margin-top:12px}.vibration-status{font-size:13px;color:var(--muted);margin-top:10px}
+.creator{text-align:center;margin-top:30px;padding-bottom:10px;font-size:13px;color:var(--muted);letter-spacing:.5px}.creator strong{color:var(--primary)}
+.time-buttons{display:flex;justify-content:center;flex-wrap:wrap}
+@media(max-width:360px){h1{font-size:32px}.circle{width:160px;height:160px}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<section id="home" class="screen active">
+<div class="topbar"><div class="logo">🌿 Mindful</div><button class="icon-btn" onclick="toggleDarkMode()" id="themeBtn">🌙</button></div>
+<div class="center"><h1>Welcome Everyone 🌿</h1><p class="subtitle">Take a few peaceful minutes for yourself. Breathe slowly. Let your mind settle.</p><button onclick="showScreen('setup')">🧘 Start Relaxation</button></div>
+<div class="card"><h3>😊 How are you feeling?</h3><div class="moods">
+<button class="mood" onclick="selectMood('😄',this)">😄</button><button class="mood" onclick="selectMood('🙂',this)">🙂</button><button class="mood" onclick="selectMood('😐',this)">😐</button><button class="mood" onclick="selectMood('😔',this)">😔</button><button class="mood" onclick="selectMood('😫',this)">😫</button>
+</div><p class="small" id="moodMessage">Select your current mood.</p></div>
+<div class="grid"><div class="stat"><div class="stat-number" id="homeSessions">0</div><div class="stat-label">Sessions</div></div><div class="stat"><div class="stat-number" id="homeMinutes">0</div><div class="stat-label">Minutes</div></div></div>
+<div class="nav"><button onclick="showScreen('stats')">📊 Stats</button><button onclick="showScreen('journal')">📝 Journal</button><button onclick="showScreen('profile')">👤 Profile</button><button onclick="showScreen('sounds')">🎵 Sounds</button></div>
+<div class="creator">Made with 💚 by <strong>Hemant</strong></div>
+</section>
+
+<section id="setup" class="screen">
+<button class="back" onclick="showScreen('home')">← Back</button><h2>🧘 Choose Your Session</h2><p class="subtitle">Select a breathing technique and duration.</p>
+<div class="card"><h3>Breathing</h3><div class="grid">
+<button class="option selected" onclick="selectBreathing('box',this)">Box<br>4-4-4-4</button>
+<button class="option" onclick="selectBreathing('simple',this)">Simple<br>5-5</button>
+<button class="option" onclick="selectBreathing('478',this)">4-7-8</button>
+<button class="option" onclick="selectBreathing('calm',this)">Calm<br>4-6</button>
+</div></div>
+<div class="card"><h3>Duration</h3><div class="grid">
+<button class="option selected" onclick="selectDuration(5,this)">5 min</button><button class="option" onclick="selectDuration(10,this)">10 min</button><button class="option" onclick="selectDuration(15,this)">15 min</button><button class="option" onclick="selectDuration(20,this)">20 min</button>
+</div><label>Custom minutes</label><input type="number" id="customMinutes" min="1" max="120" placeholder="e.g. 25" onchange="setCustomDuration()"></div>
+<div class="card"><h3>📳 Vibration</h3><button id="vibrationBtn" onclick="toggleVibration()">📳 Vibration On</button><p class="vibration-status">A gentle vibration occurs whenever INHALE / EXHALE changes.</p></div>
+<button onclick="startSession()">🌿 Begin Session</button>
+</section>
+
+<section id="session" class="screen center">
+<div class="timer" id="timer">05:00</div><div class="instruction" id="instruction">INHALE</div>
+<div class="circle inhale" id="circle">🌿</div><p class="small" id="breathDescription">Breathe in slowly.</p>
+<div class="card"><p>🎵 Relaxing Sound</p><div class="sound-buttons">
+<button onclick="setSound('rain')">🌧️ Rain</button><button onclick="setSound('ocean')">🌊 Ocean</button><button onclick="setSound('forest')">🌲 Forest</button><button onclick="setSound('white')">☁️ White Noise</button><button onclick="stopSound()" class="danger">🔇 Off</button>
+</div><label>Volume</label><input class="range" type="range" min="0" max="1" step=".01" value=".5" oninput="setVolume(this.value)"></div>
+<div class="time-buttons"><button onclick="subtractFiveMinutes()" class="danger">−5 MIN</button><button onclick="addFiveMinutes()" class="secondary">+5 MIN</button></div>
+<button onclick="pauseSession()" id="pauseBtn">⏸ Pause</button><button onclick="stopSession()" class="danger">Stop</button>
+</section>
+
+<section id="feedback" class="screen center">
+<h1>🌿 Well Done</h1><p class="subtitle">Your relaxation session is complete.</p>
+<div class="card"><h3>How was your experience?</h3><div class="stars"><span onclick="rate(1)">★</span><span onclick="rate(2)">★</span><span onclick="rate(3)">★</span><span onclick="rate(4)">★</span><span onclick="rate(5)">★</span></div>
+<textarea id="feedbackText" placeholder="How do you feel now?"></textarea><button onclick="submitFeedback()">Submit</button></div>
+</section>
+
+<section id="thanks" class="screen center"><h1>💚 Thank You</h1><p class="subtitle">Your session has been saved.</p><button onclick="showScreen('home')">Back Home</button></section>
+
+<section id="stats" class="screen">
+<button class="back" onclick="showScreen('home')">← Back</button><h2>📊 Your Progress</h2>
+<div class="grid"><div class="stat"><div class="stat-number" id="statSessions">0</div><div class="stat-label">Sessions</div></div><div class="stat"><div class="stat-number" id="statMinutes">0</div><div class="stat-label">Minutes</div></div><div class="stat"><div class="stat-number" id="statRating">-</div><div class="stat-label">Avg Rating</div></div><div class="stat"><div class="stat-number" id="statStreak">0</div><div class="stat-label">Sessions</div></div></div>
+<div class="card"><h3>Recent Sessions</h3><div id="history">No sessions yet.</div></div>
+</section>
+
+<section id="journal" class="screen">
+<button class="back" onclick="showScreen('home')">← Back</button><h2>📝 Your Journal</h2><p class="subtitle">Write whatever is on your mind.</p>
+<div class="card"><textarea id="journalText" placeholder="How was your day? What are you feeling?"></textarea><button onclick="saveJournal()">💾 Save Entry</button><p class="success" id="journalStatus"></p></div>
+<div class="card"><h3>Previous Entry</h3><p id="previousJournal" class="small">No journal entry yet.</p></div>
+</section>
+
+<section id="sounds" class="screen">
+<button class="back" onclick="showScreen('home')">← Back</button><h2>🎵 Relaxing Sounds</h2><p class="subtitle">Choose a peaceful background sound.</p>
+<div class="card"><button onclick="setSound('rain')">🌧️ Rain</button><button onclick="setSound('ocean')">🌊 Ocean</button><button onclick="setSound('forest')">🌲 Forest</button><button onclick="setSound('white')">☁️ White Noise</button><button onclick="stopSound()" class="danger">🔇 Stop</button><label>Volume</label><input class="range" type="range" min="0" max="1" step=".01" value=".5" oninput="setVolume(this.value)"></div>
+</section>
+
+<section id="profile" class="screen">
+<button class="back" onclick="showScreen('home')">← Back</button><h2>👤 Profile</h2>
+<div class="card center"><div class="profile-avatar">🌿</div><label>Your Name</label><input id="profileName" placeholder="Enter your name"><label>Your Goal</label><input id="profileGoal" placeholder="e.g. Reduce stress"><button onclick="saveProfile()">💾 Save Profile</button><p class="success" id="profileStatus"></p></div>
+<div class="card"><h3>🔔 Notifications</h3><button onclick="requestNotifications()">Enable Notifications</button></div>
+</section>
+
+</div>
+
+<script>
+let totalSeconds=300,selectedDuration=5,timerInterval=null,breathingInterval=null,isPaused=false,rating=0,selectedMood="",breathingMode="box",vibrationEnabled=true,audioContext=null,soundNodes=[],masterGain=null;
+
+function showScreen(name){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(name).classList.add("active");if(name==="stats")updateStats();if(name==="journal")loadJournal();if(name==="profile")loadProfile()}
+function toggleDarkMode(){document.body.classList.toggle("dark");let dark=document.body.classList.contains("dark");localStorage.setItem("darkMode",dark?"1":"0");document.getElementById("themeBtn").textContent=dark?"☀️":"🌙"}
+function loadTheme(){if(localStorage.getItem("darkMode")==="1"){document.body.classList.add("dark");document.getElementById("themeBtn").textContent="☀️"}}
+function toggleVibration(){vibrationEnabled=!vibrationEnabled;localStorage.setItem("vibration",vibrationEnabled?"1":"0");document.getElementById("vibrationBtn").textContent=vibrationEnabled?"📳 Vibration On":"🔕 Vibration Off";if(vibrationEnabled)vibrateTransition()}
+function loadVibration(){let saved=localStorage.getItem("vibration");if(saved!==null)vibrationEnabled=saved==="1";document.getElementById("vibrationBtn").textContent=vibrationEnabled?"📳 Vibration On":"🔕 Vibration Off"}
+function vibrateTransition(){if(vibrationEnabled&&"vibrate" in navigator)navigator.vibrate(120)}
+function selectMood(mood,button){selectedMood=mood;document.querySelectorAll(".mood").forEach(b=>b.classList.remove("selected"));button.classList.add("selected");localStorage.setItem("currentMood",mood);document.getElementById("moodMessage").textContent="Mood saved: "+mood+" 💚"}
+function selectBreathing(mode,button){breathingMode=mode;document.querySelectorAll("#setup .option").forEach(b=>b.classList.remove("selected"));button.classList.add("selected")}
+function selectDuration(minutes,button){selectedDuration=minutes;document.querySelectorAll("#setup .option").forEach(b=>b.classList.remove("selected"));button.classList.add("selected");document.getElementById("customMinutes").value=""}
+function setCustomDuration(){let value=parseInt(document.getElementById("customMinutes").value);if(value>=1&&value<=120){selectedDuration=value;document.querySelectorAll("#setup .option").forEach(b=>b.classList.remove("selected"))}}
+function startSession(){clearInterval(timerInterval);clearInterval(breathingInterval);totalSeconds=selectedDuration*60;updateTimerDisplay();isPaused=false;document.getElementById("pauseBtn").textContent="⏸ Pause";showScreen("session");startBreathing();timerInterval=setInterval(updateTimer,1000)}
+function updateTimer(){if(isPaused)return;totalSeconds--;updateTimerDisplay();if(totalSeconds<=0)completeSession()}
+function updateTimerDisplay(){let minutes=Math.floor(totalSeconds/60),seconds=totalSeconds%60;document.getElementById("timer").textContent=String(minutes).padStart(2,"0")+":"+String(seconds).padStart(2,"0")}
+function addFiveMinutes(){totalSeconds+=300;updateTimerDisplay()}
+function subtractFiveMinutes(){totalSeconds-=300;if(totalSeconds<0)totalSeconds=0;updateTimerDisplay();if(totalSeconds===0)completeSession()}
+function pauseSession(){isPaused=!isPaused;document.getElementById("pauseBtn").textContent=isPaused?"▶ Resume":"⏸ Pause"}
+function startBreathing(){clearInterval(breathingInterval);let phase=0;runBreathPhase(phase);breathingInterval=setInterval(()=>{if(isPaused)return;phase++;runBreathPhase(phase)},getBreathingInterval())}
+function getBreathingInterval(){if(breathingMode==="simple")return 5000;if(breathingMode==="478")return 4000;if(breathingMode==="calm")return 4000;return 4000}
+function runBreathPhase(phase){if(phase>0)vibrateTransition();if(breathingMode==="simple"){setBreath(phase%2===0?"INHALE":"EXHALE",phase%2===0?"Breathe in slowly.":"Breathe out slowly.",phase%2===0?"inhale":"exhale");return}if(breathingMode==="calm"){setBreath(phase%2===0?"INHALE":"EXHALE",phase%2===0?"Slowly breathe in.":"Long, gentle exhale.",phase%2===0?"inhale":"exhale");return}if(breathingMode==="478"){let p=phase%3;if(p===0)setBreath("INHALE","Breathe in gently.","inhale");else if(p===1)setBreath("HOLD","Hold gently.","hold");else setBreath("EXHALE","Slowly breathe out.","exhale");return}let p=phase%4;if(p===0)setBreath("INHALE","Breathe in.","inhale");else if(p===1)setBreath("HOLD","Hold gently.","hold");else if(p===2)setBreath("EXHALE","Breathe out slowly.","exhale");else setBreath("HOLD","Rest and stay relaxed.","hold")}
+function setBreath(text,description,className){document.getElementById("instruction").textContent=text;document.getElementById("breathDescription").textContent=description;let circle=document.getElementById("circle");circle.classList.remove("inhale","exhale","hold");circle.classList.add(className)}
+function completeSession(){clearInterval(timerInterval);clearInterval(breathingInterval);stopSound();saveSession(selectedDuration);notifyUser();showScreen("feedback")}
+function stopSession(){clearInterval(timerInterval);clearInterval(breathingInterval);stopSound();showScreen("home")}
+function saveSession(minutes){let sessions=getSessions();sessions.push({date:new Date().toLocaleString(),minutes,mood:selectedMood,rating:0});localStorage.setItem("sessions",JSON.stringify(sessions))}
+function getSessions(){return JSON.parse(localStorage.getItem("sessions")||"[]")}
+function updateStats(){let sessions=getSessions(),minutes=0,ratings=[];sessions.forEach(s=>{minutes+=Number(s.minutes)||0;if(s.rating)ratings.push(s.rating)});let average=ratings.length?(ratings.reduce((a,b)=>a+b,0)/ratings.length).toFixed(1):"-";document.getElementById("statSessions").textContent=sessions.length;document.getElementById("statMinutes").textContent=minutes;document.getElementById("statRating").textContent=average;document.getElementById("statStreak").textContent=sessions.length;document.getElementById("homeSessions").textContent=sessions.length;document.getElementById("homeMinutes").textContent=minutes;let history=document.getElementById("history");if(!sessions.length){history.textContent="No sessions yet.";return}history.innerHTML=sessions.slice().reverse().slice(0,10).map(s=>`<div class="history-item">🌿 ${s.minutes} minute session ${s.mood||""}<br><span class="small">${s.date}</span></div>`).join("")}
+function rate(value){rating=value;document.querySelectorAll(".stars span").forEach((star,index)=>star.classList.toggle("selected",index<value))}
+function submitFeedback(){let sessions=getSessions();if(sessions.length){sessions[sessions.length-1].rating=rating;sessions[sessions.length-1].feedback=document.getElementById("feedbackText").value;localStorage.setItem("sessions",JSON.stringify(sessions))}document.getElementById("feedbackText").value="";showScreen("thanks")}
+function saveJournal(){let text=document.getElementById("journalText").value.trim();if(!text)return;localStorage.setItem("journal",JSON.stringify({text,date:new Date().toLocaleString()}));document.getElementById("journalStatus").textContent="Saved successfully 💚";loadJournal()}
+function loadJournal(){let entry=JSON.parse(localStorage.getItem("journal")||"null");if(!entry){document.getElementById("previousJournal").textContent="No journal entry yet.";return}document.getElementById("previousJournal").textContent=entry.text+" — "+entry.date;document.getElementById("journalText").value=entry.text}
+function saveProfile(){let name=document.getElementById("profileName").value,goal=document.getElementById("profileGoal").value;localStorage.setItem("profile",JSON.stringify({name,goal}));document.getElementById("profileStatus").textContent="Profile saved 💚"}
+function loadProfile(){let profile=JSON.parse(localStorage.getItem("profile")||"null");if(!profile)return;document.getElementById("profileName").value=profile.name||"";document.getElementById("profileGoal").value=profile.goal||""}
+async function requestNotifications(){if(!("Notification" in window)){alert("Notifications are not supported by this browser.");return}let permission=await Notification.requestPermission();if(permission==="granted")new Notification("🌿 Mindful",{body:"Notifications enabled."});else alert("Notification permission was not granted.")}
+function notifyUser(){if("Notification" in window&&Notification.permission==="granted")new Notification("🌿 Relaxation Complete",{body:"Well done. Take a moment to notice how you feel."})}
+function createAudio(){if(audioContext)return;audioContext=new(window.AudioContext||window.webkitAudioContext)();masterGain=audioContext.createGain();masterGain.gain.value=.5;masterGain.connect(audioContext.destination)}
+function setVolume(value){createAudio();masterGain.gain.value=Number(value)}
+function stopSound(){soundNodes.forEach(node=>{try{node.stop()}catch(e){}});soundNodes=[]}
+function setSound(type){createAudio();stopSound();if(audioContext.state==="suspended")audioContext.resume();if(type==="rain")createNoise("rain");else if(type==="ocean")createOcean();else if(type==="forest")createForest();else if(type==="white")createNoise("white")}
+function createNoise(type){let bufferSize=audioContext.sampleRate*2,buffer=audioContext.createBuffer(1,bufferSize,audioContext.sampleRate),data=buffer.getChannelData(0);for(let i=0;i<bufferSize;i++){let random=Math.random()*2-1;data[i]=random*(type==="rain"?.25:.5)}let source=audioContext.createBufferSource();source.buffer=buffer;source.loop=true;let filter=audioContext.createBiquadFilter();filter.type=type==="rain"?"lowpass":"highpass";filter.frequency.value=type==="rain"?1800:5000;source.connect(filter).connect(masterGain);source.start();soundNodes.push(source)}
+function createOcean(){createNoise("rain");let oscillator=audioContext.createOscillator(),gain=audioContext.createGain();oscillator.type="sine";oscillator.frequency.value=90;gain.gain.value=.08;oscillator.connect(gain).connect(masterGain);oscillator.start();soundNodes.push(oscillator)}
+function createForest(){createNoise("white");let oscillator=audioContext.createOscillator(),gain=audioContext.createGain();oscillator.type="sine";oscillator.frequency.value=250;gain.gain.value=.025;oscillator.connect(gain).connect(masterGain);oscillator.start();soundNodes.push(oscillator)}
+loadTheme();loadVibration();updateStats();loadJournal();loadProfile();
+</script>
+</body>
+</html>
